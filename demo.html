@@ -40,12 +40,8 @@
   </head>
   <body>
     <div class="game">
-      <div class="game-head">
-
-      </div>
-      <div class="game-body">
-
-      </div>
+      <div class="game-head"> </div>
+      <div class="game-body"> </div>
 
     </div>
     <script>
@@ -110,13 +106,66 @@
               gameEmptyItem = oI;
               gameEmptyItem.gameMap.address = grid.list*grid.colum - 1;//在游戏中的位置
             }else{
+
+              // 给 i 添加点击事件, 当 i 被点击时执行
+              oI.onclick = function(){
+
+
+                // 下一个
+                if((this.gameMap.address + 1)%grid.colum != 0 && gameItem[this.gameMap.address + 1] === gameEmptyItem){
+  
+                  gameBody.insertBefore(gameEmptyItem, this)
+
+                  // 更换序号
+                  that = this;
+                  changeNum()
+
+                }else if((this.gameMap.address)%grid.colum != 0 && gameItem[this.gameMap.address - 1] === gameEmptyItem){ //上一个
+                  gameBody.insertBefore(this, gameEmptyItem);
+                  
+                  // 更换序号
+                  that = this;
+                  changeNum() 
+                }else if(gameItem[this.gameMap.address + grid.colum] === gameEmptyItem){ //往上p跑
+
+
+                  // 找到当前的下一个节点
+                  let findNext = gameItem[this.gameMap.address].nextSibling,
+                      emptyNext = gameEmptyItem.nextSibling;
+
+                  gameBody.insertBefore(gameEmptyItem, findNext);
+                  // 判断是否找到下一个节点
+                  if(emptyNext){
+                    gameBody.insertBefore(this, emptyNext);
+                  }else{
+                    gameBody.appendChild(gameItem[this.gameMap.address])
+                  }
+                  // 更换序号
+                  that = this;
+                  changeNum()
+                }else if(gameItem[this.gameMap.address - grid.colum] === gameEmptyItem){//往下跑
+                  
+                  
+                  // 找到当前的下一个节点
+                  let findNext = gameItem[this.gameMap.address].nextSibling,
+                      emptyNext = gameEmptyItem.nextSibling;
+                  gameBody.insertBefore(this, emptyNext);
+                  if(findNext){
+                    gameBody.insertBefore(gameEmptyItem, findNext);
+                  }else{
+                    gameBody.appendChild(gameEmptyItem)
+                  }
+                  // 更换序号
+                  that = this;
+                  changeNum()
+                }
+
+              }
+
                // 把新建的 i 添加进数组
               itemStart.push(oI)
             }
 
-            // gameBody.appendChild(oI)
-
-           
           }
         }
         
@@ -136,16 +185,42 @@
         }
 
         // 将空标签添加到最后一个
-         gameBody.appendChild(gameEmptyItem);
+        gameBody.appendChild(gameEmptyItem);
 
+        // 判断是否拼完
+        function checkEnd(){
 
+          let _status = true;
+          for(let i=1,len = gameItem.length; i<len; i++ ){
+
+            if(gameItem[i-1].gameMap.index + 1 != gameItem[i].gameMap.index){
+              _status = false;
+              break;
+            }
+          }
+          
+          if(_status){
+            gameEmptyItem.className = "";
+            
+            setTimeout(() => {
+              alert("666");
+            }, 1000);
+            
+          }
+        }
+
+        // 更换序号的封装函数
+        function changeNum(){
+          checkEnd();
+          that.gameMap.address += gameEmptyItem.gameMap.address;
+          gameEmptyItem.gameMap.address = that.gameMap.address - gameEmptyItem.gameMap.address;
+          that.gameMap.address -= gameEmptyItem.gameMap.address;
+        }
 
          // 设置元素的样式
         function setStyle(ele, attr){ 
           // 需要设置单位的属性
           let emAttr = ["width", "height"];
-
-          
 
           for (const key in attr) {
             
